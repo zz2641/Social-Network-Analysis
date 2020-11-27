@@ -1,0 +1,332 @@
+---
+title: "HUDK4051: Social Network Analysis"
+author: "Charles Lang"
+date: "1/26/2018"
+output: html_document
+---
+
+In this assignment you will be generating and analyzing three social networks (also known as graphs or sociograms) based on three different measures. You will be using data from:
+
+Representing Classroom Social Structure. Melbourne: Victoria Institute of
+Secondary Education, M. Vickers and S. Chan, (1981)
+
+Available from the Index of Complex Networks ([ICON](https://icon.colorado.edu/#!/))
+
+The data were collected by Vickers & Chan from 29 seventh grade students in a school in Victoria, Australia. Students were asked to nominate their classmates on a number of relations including the following three "layers":  
+
+1. Who do you get on with in the class?  
+2. Who are your best friends in the class?  
+3. Who would you prefer to work with?  
+
+You have a data set for each of these questions, please complete the following tasks.
+
+## Data Wrangling
+
+Manipulate each of the data sets so that it is suitable for building a social network using iGraph.
+
+```{r}
+library(tidyverse)
+go<-read.csv("get.on.with.csv",header = TRUE,stringsAsFactors = FALSE)
+bf<-read.csv("best.friends.csv",header = TRUE,stringsAsFactors = FALSE)
+ww<-read.csv("work.with.csv",header = TRUE,stringsAsFactors = FALSE)
+
+# Compiling the data, to distinguish the edge (frequency of connection) node/ vertex (individuals)
+#Get on layer
+EDGE_go <- go %>% count(from,to)
+names(EDGE_go)<-  c("From", "To", "Count")
+VERTEX_go <- go %>% select(from, gender.from) 
+VERTEX_go <- unique(VERTEX_go)
+names(VERTEX_go) <- c("ID", "Gender")
+
+#Best friend layer
+EDGE_bf<-bf%>%count(from,to)
+names(EDGE_bf)<- c("From", "To", "Count")
+VERTEX_bf <- bf %>% 
+  select(from, gender.from) %>%
+  unique()
+names(VERTEX_bf) <- c("ID", "Gender")
+
+#Work with layer
+EDGE_ww<-ww%>%count(from,to)
+names(EDGE_ww)<- c("From", "To", "Count")
+VERTEX_ww <- ww %>% 
+  select(from, gender.from) %>%
+  unique()
+names(VERTEX_ww) <- c("ID", "Gender")
+
+
+```
+
+## Visualize the Networks
+
+Create a graph for each of the data sets, are the graphs directed or undirected? Visualize each of the graphs you have created and color the nodes according to gender. Save pdfs of your graphs in this directory for upload to Github.
+
+```{r}
+# Comments:
+ # The graphs will be directed because students are asked to nominate their classmates.
+library(igraph)
+# Get on with layer
+VERTEX_go$Gender<-factor(VERTEX_go$Gender)
+G2 <- graph.data.frame(EDGE_go, directed=TRUE, vertices = VERTEX_go) 
+pdf(file="/Users/zhongyuanzhang/Desktop/TC courses/4051 Learning Analytics /social-network-analysis/Get_On_With_Social_Network.pdf") # step 1
+plot(G2, layout=layout.fruchterman.reingold, vertex.color=VERTEX_go$Gender, edge.width=EDGE_go$Count, edge.arrow.size=0.5, main = "Who do you get on with in the class?") # step2
+
+while (!is.null(dev.list()))  dev.off()
+#dev.off() #step 3 whenever this line is not working try the one above
+
+#Best friends layer
+VERTEX_bf$Gender<-factor(VERTEX_bf$Gender)
+G3<-graph.data.frame(EDGE_bf,directed = TRUE,vertices = VERTEX_bf)
+pdf(file="/Users/zhongyuanzhang/Desktop/TC courses/4051 Learning Analytics /social-network-analysis/Best_Friend_Social_Network.pdf") 
+plot(G3,layout=layout.fruchterman.reingold, vertex.color=VERTEX_bf$Gender,edge.width=EDGE_bf$Count,edge.arrow.size=0.5, main = "Who are your best friends in the class?")
+
+while (!is.null(dev.list()))  dev.off()
+
+
+#Work with layer
+VERTEX_ww$Gender<-factor(VERTEX_ww$Gender)
+G4<-graph.data.frame(EDGE_ww,directed = TRUE,vertices = VERTEX_ww)
+pdf(file="/Users/zhongyuanzhang/Desktop/TC courses/4051 Learning Analytics /social-network-analysis/Work_With_Social_Network.pdf") 
+plot(G4,layout=layout.fruchterman.reingold, vertex.color=VERTEX_ww$Gender,edge.width=EDGE_ww$Count,edge.arrow.size=0.5, main = "Who would you prefer to work with?")
+
+while (!is.null(dev.list()))  dev.off()
+```
+
+## Centrality Measures
+
+Who in the class has the highest degree centrality for each measure?
+```{r}
+# Degrees for each layer # the number of its adjacent edges.
+ degree(G2, mode = "in")            
+ degree(G3, mode = "in")
+ degree(G4, mode = "in")  
+ 
+ #Character string, “out” for out-degree, “in” for in-degree or “total” for the sum of the two.
+ #For undirected graphs this argument is ignored. “all” is a synonym of “total”.
+
+ # The highest degree in each layer
+which.max(degree(G2, mode = "in"))# 14 
+# this syntax cannot detect indices that share the same maximum degree
+which.max(degree(G3, mode="in"))  # 21
+which.max(degree(G4, mode="in")) # 16
+ 
+which(degree(G2, mode = "in")==max(degree(G2, mode = "in"))) #14 16
+which(degree(G3, mode = "in")==max(degree(G3, mode = "in"))) #21
+which(degree(G4, mode = "in")==max(degree(G4, mode = "in"))) #16
+
+#Comment
+#Degree of a vertex is the most basic structural property, the simplest measure of centrality, representing the number of its adjacent edges.
+# In its parameters, the mode offers two options: 
+#“out” for out-degree, “in” for in-degree or “total” for the sum of the two.
+# The results told us that in the "Get on with layer" students with id:14 and 16 have the most incoming connections/ edges, namely both have the highest in-degree centrality of 19
+# "Best friend layer": students with id of 21 has the most incoming connections/edges, namely has the highest in-degree centrality 12
+# "Work with layer" students with id of 21 has the most incoming connections/edges, namely has the highest in-degree centrality 17
+```
+
+Does **degree centrality** mean the same thing for each of your networks? Does it make sense for each of your networks?
+
+### Comments:
+ # The degree centrality means differently in each network. It depends on the context.
+ 
+ # As for the "Get on with" network, the in-degree centrality is the measurement of the number of classmates who think the student as an perosn to get on with. In other words, the student with highest in-degree in this network is the most easy-going person that is selected by her or his classmates.
+ # As for the "Best friends" network, the in-degree centrality is the measurement of the number of classmates who deem the student as a best friend. In other words, the student with highest in-degree in this network is the one who many students value the most with regards to friendship, but not necessarily that many would like to work with or get on with.
+ # As for the "Work with" network, the in-degree centrality is the measurement of the number of classmates who deem the student as a cooperator. In other words, the student with highest in-degree in this network is the most reliable or responsible person to work with that is selected by her or his classmates.
+
+Who in the class has the highest closeness centrality?
+
+```{r}
+# Closeness for each layer, node's role that is critical inbetween:bridge
+ closeness(G2, mode = "in")        
+ closeness(G3, mode = "in") 
+ closeness(G4, mode = "in") 
+
+ # The highest closeness for each layer
+ which.max(closeness(G2, mode = "in"))
+ which.max(closeness(G3, mode = "in"))
+ which.max(closeness(G4, mode = "in"))
+ 
+which(closeness(G2, mode = "in")==max(closeness(G2, mode = "in")))
+which(closeness(G3, mode = "in")==max(closeness(G3, mode = "in")))
+which(closeness(G4, mode = "in")==max(closeness(G4, mode = "in")))
+
+ ### Comments:
+#Closeness centrality measures how many steps is required to access every other vertex from a given vertex.
+#It is the average length of the shortest path between the node and the other nodes. 
+
+ # The 14 and 16 student have the highest in-closeness centrality for "Get on with" network, with the highest in-closeness centrality 0.02631579.
+ # The 21 student has the highest in-closeness centrality for "Best friends" network, with the highest in-closeness centrality 0.020833333.
+ # The 16 student has the highest in-closeness centrality for "Work with" network, with the highest in-closeness centrality 0.010416667.
+
+# Here in the third graph a warning popped up:At centrality.c:2784 :closeness centrality is not well-defined for disconnected graphsAt centrality
+#Meaning: The closeness centrality of a vertex is defined by the inverse of the average length of the shortest paths to/from all the other vertices in the graph:
+#But what if there are two vertices that have no path between them? How would you compute this? There is no clear answer to this and that is why closeness is not well defined in this case. How is it possible that two nodes might have no path between them? If the graph is disconnected, i.e. has more than one connected component. Let me illustrate with a very simple graph.
+```
+
+How does **betweeness centrality** differ from degree centrality? Is one more useful than the other? Does their utility differ between your three networks?[https://www.youtube.com/watch?v=0aqvVbTyEmc]
+
+```{r}
+# Betweeness centrality in each layer; The vertex and edge betweenness are (roughly) defined by the number of geodesics (shortest paths) going through a vertex or an edge.
+# One advantage of betweenness centrality compared to closeness centrality: you don't need a fully connected graph or component to calculate it. A component is a group of nodes connected to each other.
+#It is a measure of how often a node is a bridge between other nodes.
+
+# Nodes with the highest betweenness centrality are often important controller of power or information
+
+ betweenness(G2)
+ betweenness(G3)
+ betweenness(G4)
+
+ which.max(betweenness(G2)) # 11
+ which.max(betweenness(G3)) # 28
+ which.max(betweenness(G4)) # 11
+
+which(betweenness(G2)==max(betweenness(G2))) # 11
+which(betweenness(G3)==max(betweenness(G3))) # 28
+which(betweenness(G4)==max(betweenness(G4))) # 11
+
+ ### Comments: 
+ # Degree centrality assigns an importance score based simply on the number of links held by each node. It tells us about how many directed connections each node has to other nodes in the network. It is useful for finding connected and popular individuals, who are likely to hold most information or individuals who can quickly connect with the wider network. Degree centrality is the simplest measure of node connectivity. 
+
+ # Betweenness centrality measures the number of times a node lies on the shortest path between other nodes. This measure shows which nodes are ‘bridges’ between nodes in a network. It does this by identifying all the shortest paths and then counting how many times each node goes through one. It is useful for finding the individuals who influence the flow around a system. A high betweenness count could indicate someone holds authority over disparate clusters in a network, or just that they are on the periphery of both clusters.
+ 
+ # In these three networks, both of the measurements are useful, since the degree centrality measures the very connected individuals in class in terms of different critierion. At the same time, the between centrality measures communication dynamics in the class, finding out the individuals who influence the flow around the class.
+
+
+```
+
+
+## Simple structures
+
+Count the number of dyads and the number and type of triads using the following commands.
+```{r}
+#Classify dyads in a directed graphs. The relationship between each pair of vertices is measured. It can be in three states: mutual, asymmetric or non-existent.
+dyad_census(G2) #mutual 121 pairs of student think mutually that they would like to get on with each other ;asy 199; null 166
+dyad_census(G3)#mutual 55 pairs of student think mutually that they are best friend with each other ;asy 71 pairs of student think one-wayly the other is their best friend; null 166
+
+dyad_census(G4)#mutual 46 pairs of student think mutually that they are good to work with each other ;asy 106; null 256, it seems that few of these students have tacit agreement on cooperation.
+```
+[Documentation](http://igraph.org/r/doc/dyad_census.html)
+
+```{r}
+#This function counts the different subgraphs of three vertices in a graph.
+# 3 in a unit 16 posible states
+triad_census(G2)
+triad_census(G3)
+triad_census(G4)
+
+which.max(triad_census(G2)) #3 A<->B, C, the graph with a mutual connection between two vertices.
+which.max(triad_census(G3)) #1 A,B,C, the empty graph.
+order(triad_census(G3),decreasing=TRUE) 
+#(Not counting for the empty graph.) 2 A->B, C, the graph with a single directed edge.
+which.max(triad_census(G4)) #1 A,B,C, the empty graph.
+order(triad_census(G4),decreasing=TRUE) 
+#(Not counting for the empty graph.) 2 A->B, C, the graph with a single directed edge.
+
+```
+[Documentation](http://igraph.org/r/doc/triad_census.html)
+
+Do these metrics tell you anything about the networks? If so what?
+
+# Comments:
+ #These metrics classify dyads in a directed graphs. The relationship between each pair of vertices is measured. It can be in three states: mutual, asymmetric or non-existent.
+ # Mut means	the number of pairs with mutual connections.
+ # Asym means	the number of pairs with non-mutual connections.
+ # Null means	the number of pairs with no connection between them.
+ # comments with regards to dyads census has been listed above
+ 
+ # For triad funciton, matrics whose 16 columns contain the counts of triads by class for each graph were provided.
+ # For "Get on with" network, the most frequent triad census is the graph with a mutual connection between two vertices. (Not counting the empty graph.)
+ # For "Best friends" network, the most frequent triad census is the graph with a single directed edge. (Not counting for the empty graph.)
+ # For "Work with" network, the most frequent triad census is the graph with a single directed edge. (Not counting for the empty graph.)
+ 
+## Cliques
+
+Answer the following questions using the [clique functions](http://igraph.org/r/doc/cliques.html)
+
+ #These functions find all, the largest or all the maximal cliques in an ‘undirected’ graph. The size of the largest clique can also be calculated. a k vertex clique requires each vertex within to have k-1 edges.
+ 
+ #cliques find all complete subgraphs in the input graph, obeying the size limitations given in the min and max arguments.
+
+ #largest_cliques finds all largest cliques in the input graph. A clique is largest if there is no other clique including more vertices.
+
+ #max_cliques finds all maximal cliques in the input graph. A clique in maximal if it cannot be extended to a larger clique. The largest cliques are always maximal, but a maximal clique is not neccessarily the largest.
+
+ #count_max_cliques counts the maximal cliques.
+
+ #clique_num calculates the size of the largest clique(s).
+
+ #The current implementation of these functions searches for maximal independent vertex sets (see ivs) in the complementer graph.
+
+What is the size of the largest clique(s) in each of the three networks?
+
+```{r}
+largest.cliques(G2) #warning:At cliques.c:1087 :directionality of edges is ignored for directed graphs
+largest.cliques(G3) 
+largest.cliques(G4)   
+
+clique_num(G2) #12
+clique_num(G3) #7
+clique_num(G4) #9
+
+### Comments:
+ # The size of the largest clique for "Get on with" network is 12.
+ # The size of the largest clique for "Best friends" network is 7.
+ # The size of the largest clique for "Work with" network is 9.
+```
+
+Which nodes/vertices are in the largest cliques for the three networks? Is there much overlap?
+
+```{r}
+### Comments:
+ # In the "Get on with" network, 8, 11, 27, 15, 13, 24, 23, 20, 14, 19, 22, 21, 26, and 16 are in the largest cliques.
+ # In the "Best friends" network, 23, 14, 8, 15, 19, 20, 21, 22, 13, 16, and 11 are in the largest cliques. 
+ # In the "Work with" network, 6, 8, 11, 15, 16, 14, 19, 23, 20, 21, and 22 are in the largest cliques.
+ # There is much of overlap. 
+```
+
+How many **maximal cliques** are there in each of the networks?
+
+```{r}
+# Maximal cliques in each layer:
+ count_max_cliques(G2)  #64  max_cliques(G2)
+ count_max_cliques(G3)  #35
+ count_max_cliques(G4)  #36
+ 
+ ### Comments:
+ # The number of maximal cliques for "Get on with" network is 64.
+ # The number of maximal cliques for "Best friends" network is 35.
+ # The number of maximal cliques for "Work with" network is 36.
+```
+
+## Components & Cutpoints
+
+Find the  (articulation points) for each of the three networks you generated. What does this tell you about the graphs? Does what you find match a visual exploration of the networks?
+
+ #A cutpoint (also known as an articulation point or cut-vertex) of an undirected graph, G is a vertex whose removal increases the number of components of G. Several generalizations to the directed case exist.
+
+```{r}
+ # The cutpoints in each layer
+ articulation_points(G2)  
+ articulation_points(G3) 
+ articulation_points(G4)  
+ 
+### Comments:
+ # There is no cutpoint for "Get on with" network.
+ # The cutpoints for "Best friends" network is the student with an id of 13.
+ # The cutpoints for "Work with" network is the student  with an id of 13.
+ 
+ # A vertex in a graph is an articulation point (or cut vertex) if removed, the graph becomes disconnected. Articulation points represent vulnerabilities in a connected network – single points whose failure would split the network into 2 or more disconnected components. 
+ # There is no cutpoint in "Get on with" network, which implies that the whole network is densely connected, with no distinguishable groups. 
+ # There is one cutpoint in "Best friends" network, the student 13. This implies that the whole network will be divided into two groups, if student 13 was removed from the network. 
+ # There is also one cutpoint in "Work with" network, the student 13. This implies that the whole network will be divided into two groups, if student 13 was removed from the network.
+```
+
+
+## Putting it all together
+
+Write a narrative description of the social ties among members of this 7th grade class using the network, centrality and structural metrics you have developed. Can you provide any recommendations to the teacher of this class based on your analysis? What other information would you want to know? Can you remeber being in seventh grade, does this refelct your experience?
+
+### Comments:
+ # After measuring the network, centrality and structural metrics on students' ideas of getting along with others, being best friends with others and intention to work with others, it seems that the class has a harmonous atmosphere that no one has been isolated so far. However, as the visulization and analysis showed, it appears two distinguishable groups bridged by student 13, indicating two possible trends in terms of choosing best friends, and selecting the preferable team player(s). There is also a gender distinction. When it comes to friendships, these teenager girls tend to have bigger social group than their opposite sex. Besides, female students tend to have larger clique than male students. Nonetheless, different gender groups still communicate with each other in the class. Student 8, 11, 14, 16, 20, 21, 22, 23 have quite high centrality in all the networks, which implies that these students serve as important connection to other students.In terms of reciprocity, there are more mutual and asymmeric dyads in "Get on with" network than the other two. 
+ # To support a more connected and dynamic classroom, the teacher can balance the proportion of students regarding gender when doing group projects to enhance the communication between gender groups. Also, the teacher needs to pay more attention on students who could easily drift away from the class, such as student 18 and 25, both of whom only get involved in the class via student 13. 
+ # Apart from these results, I am also interested in the hiearchical significance of the three networks.
+ # The results from this social network analysis remind me of my seventh grade, a time when early adolescents had small cliques representing some of their unique identity and characteristics. There were also popular students that connected different groups.    
