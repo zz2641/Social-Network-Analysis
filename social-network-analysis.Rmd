@@ -1,11 +1,11 @@
 ---
 title: "HUDK4051: Social Network Analysis"
-author: "Charles Lang"
-date: "1/26/2018"
+author: "Zhongyuan Zhang"
+date: "1/26/2020"
 output: html_document
 ---
 
-In this assignment you will be generating and analyzing three social networks (also known as graphs or sociograms) based on three different measures. You will be using data from:
+In this project we will be generating and analyzing three social networks (also known as graphs or sociograms) based on three different measures. We will be using data from:
 
 Representing Classroom Social Structure. Melbourne: Victoria Institute of
 Secondary Education, M. Vickers and S. Chan, (1981)
@@ -18,7 +18,7 @@ The data were collected by Vickers & Chan from 29 seventh grade students in a sc
 2. Who are your best friends in the class?  
 3. Who would you prefer to work with?  
 
-You have a data set for each of these questions, please complete the following tasks.
+We have a data set for each of these questions, please complete the following tasks.
 
 ## Data Wrangling
 
