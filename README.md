@@ -3,6 +3,19 @@ Exploring classroom atmosphere via relationship network
 
 Social network anlaysis has found utility is institutional, classroom and analyses of networked data in socially-based educational games. However, the utility of the method largely rests on being able to ascribe meaning to the structure of the network. Without meaningful interpretation of structure there is no added value to a networked model, you will find more success simply regressing your outcome against student characteristics. Understanding measures of centrality and network structure in SNA are therefore an important, though difficult, aspect of the method. As with all SNA work, the vocabulary can be daunting though the ideas are relatively intuitive.
 
+## Packages:
+library(tidyverse)
+library(igraph)
+
+## Terminology
+Degree centrality: Degree centrality measures # the number of its adjacent edges for each layer .
+
+Closeness centrality: Closeness centrality measures how many **steps** is required to access every other vertex from a given vertex.
+It is the **average length** of the shortest path between the node and the other nodes. 
+
+Betweenness centrality: It is a measure of how often a node is a bridge between other nodes.The vertex and edge betweenness are (roughly) defined by the number of geodesics (shortest paths) going through a vertex or an edge.
+
+
 ## Goals for this unit
 
 * Be able to generate a basic sociogram

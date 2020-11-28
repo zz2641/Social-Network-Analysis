@@ -157,23 +157,22 @@ which(closeness(G4, mode = "in")==max(closeness(G4, mode = "in")))
 
 ```
  ### Comments:
- #Closeness centrality measures how many steps is required to access every other vertex from a given vertex.
- #It is the average length of the shortest path between the node and the other nodes. 
-
+ 
  # The 14 and 16 student have the highest in-closeness centrality for "Get on with" network, with the highest in-closeness centrality 0.02631579. In the get on context, it seems to make little sense.
  
  # The 21 student has the highest in-closeness centrality for "Best friends" network, with the highest in-closeness centrality 0.020833333, meaning student number 21 is surrounded by people that,if you want to join in the circle, you may face some network obstacles.
  # The 16 student has the highest in-closeness centrality for "Work with" network, with the highest in-closeness centrality 0.010416667. In the cooperation context, it seems to make little sense.
  
 
- # Here in the third graph a warning popped up:At centrality.c:2784 :closeness centrality is not well-defined for disconnected graphsAt centrality
+ # Here in the third graph a warning popped up:At centrality.c:2784 :closeness centrality is not well-defined for disconnected graphs at centrality
  #Meaning: The closeness centrality of a vertex is defined by the inverse of the average length of the shortest paths to/from all the other vertices in the graph:
- #But what if there are two vertices that have no path between them? How would you compute this? There is no clear answer to this and that is why closeness is not well defined in this case. How is it possible that two nodes might have no path between them? If the graph is disconnected, i.e. has more than one connected component. Let me illustrate with a very simple graph.
+ 
+ #We notice that there are two vertices that have no path between them? How would the program compute the length? There is no clear answer to this and that is why closeness is not well defined in this case. How is it possible that two nodes might have no path between them? If the graph is disconnected, i.e. has more than one connected component. Let me illustrate with a very simple graph.
 
 How does **betweeness centrality** differ from degree centrality? Is one more useful than the other? Does their utility differ between your three networks?[https://www.youtube.com/watch?v=0aqvVbTyEmc]
   
 ```{r}
-# Betweeness centrality in each layer; The vertex and edge betweenness are (roughly) defined by the number of geodesics (shortest paths) going through a vertex or an edge.
+
 # One advantage of betweenness centrality compared to closeness centrality: you don't need a fully connected graph or component to calculate it. A component is a group of nodes connected to each other.
 #It is a measure of how often a node is a bridge between other nodes.
 
