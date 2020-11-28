@@ -34,8 +34,9 @@ ww<-read.csv("work.with.csv",header = TRUE,stringsAsFactors = FALSE)
 #Get on layer
 EDGE_go <- go %>% count(from,to)
 names(EDGE_go)<-  c("From", "To", "Count")
+
 VERTEX_go <- go %>% select(from, gender.from) 
-VERTEX_go <- unique(VERTEX_go)
+VERTEX_go <- unique(VERTEX_go)#find out from and its gender
 names(VERTEX_go) <- c("ID", "Gender")
 
 #Best friend layer
@@ -68,7 +69,7 @@ library(igraph)
 # Get on with layer
 VERTEX_go$Gender<-factor(VERTEX_go$Gender)
 G2 <- graph.data.frame(EDGE_go, directed=TRUE, vertices = VERTEX_go) 
-pdf(file="/Users/zhongyuanzhang/Desktop/TC courses/4051 Learning Analytics /social-network-analysis/Get_On_With_Social_Network.pdf") # step 1
+pdf(file="/Users/zhongyuanzhang/Desktop/social-network-analysis-master/Social-Network-Analysis/Get_On_With_Social_Network.pdf") # step 1
 plot(G2, layout=layout.fruchterman.reingold, vertex.color=VERTEX_go$Gender, edge.width=EDGE_go$Count, edge.arrow.size=0.5, main = "Who do you get on with in the class?") # step2
 
 while (!is.null(dev.list()))  dev.off()
@@ -77,7 +78,7 @@ while (!is.null(dev.list()))  dev.off()
 #Best friends layer
 VERTEX_bf$Gender<-factor(VERTEX_bf$Gender)
 G3<-graph.data.frame(EDGE_bf,directed = TRUE,vertices = VERTEX_bf)
-pdf(file="/Users/zhongyuanzhang/Desktop/TC courses/4051 Learning Analytics /social-network-analysis/Best_Friend_Social_Network.pdf") 
+pdf(file="/Users/zhongyuanzhang/Desktop/social-network-analysis-master/Social-Network-Analysis/Best_Friend_Social_Network.pdf") 
 plot(G3,layout=layout.fruchterman.reingold, vertex.color=VERTEX_bf$Gender,edge.width=EDGE_bf$Count,edge.arrow.size=0.5, main = "Who are your best friends in the class?")
 
 while (!is.null(dev.list()))  dev.off()
@@ -86,7 +87,7 @@ while (!is.null(dev.list()))  dev.off()
 #Work with layer
 VERTEX_ww$Gender<-factor(VERTEX_ww$Gender)
 G4<-graph.data.frame(EDGE_ww,directed = TRUE,vertices = VERTEX_ww)
-pdf(file="/Users/zhongyuanzhang/Desktop/TC courses/4051 Learning Analytics /social-network-analysis/Work_With_Social_Network.pdf") 
+pdf(file="/Users/zhongyuanzhang/Desktop/social-network-analysis-master/Social-Network-Analysis/Work_With_Social_Network.pdf") 
 plot(G4,layout=layout.fruchterman.reingold, vertex.color=VERTEX_ww$Gender,edge.width=EDGE_ww$Count,edge.arrow.size=0.5, main = "Who would you prefer to work with?")
 
 while (!is.null(dev.list()))  dev.off()
@@ -101,7 +102,7 @@ Who in the class has the highest degree centrality for each measure?
  degree(G3, mode = "in")
  degree(G4, mode = "in")  
  
- #Character string, “out” for out-degree, “in” for in-degree or “total” for the sum of the two.
+ #Character string, “out” for out-degree, “in” for in-degree or “total” for the sum of the two. in: coming in from other vertex
  #For undirected graphs this argument is ignored. “all” is a synonym of “total”.
 
  # The highest degree in each layer
@@ -117,10 +118,12 @@ which(degree(G4, mode = "in")==max(degree(G4, mode = "in"))) #16
 #Comment
 #Degree of a vertex is the most basic structural property, the simplest measure of centrality, representing the number of its adjacent edges.
 # In its parameters, the mode offers two options: 
-#“out” for out-degree, “in” for in-degree or “total” for the sum of the two.
-# The results told us that in the "Get on with layer" students with id:14 and 16 have the most incoming connections/ edges, namely both have the highest in-degree centrality of 19
-# "Best friend layer": students with id of 21 has the most incoming connections/edges, namely has the highest in-degree centrality 12
-# "Work with layer" students with id of 21 has the most incoming connections/edges, namely has the highest in-degree centrality 17
+
+# The results told us that in the "Get on with layer" students with id:14 and 16 have the most incoming connections/ edges, with an in-degree centrality of 19
+
+# "Best friend layer": students with id of 21 has the most incoming connections/edges, with an in-degree centrality 12
+
+# "Work with layer" students with id of 21 has the most incoming connections/edges, with an in-degree centrality 17
 ```
 
 Does **degree centrality** mean the same thing for each of your networks? Does it make sense for each of your networks?
@@ -128,11 +131,13 @@ Does **degree centrality** mean the same thing for each of your networks? Does i
 ### Comments:
  # The degree centrality means differently in each network. It depends on the context.
  
- # As for the "Get on with" network, the in-degree centrality is the measurement of the number of classmates who think the student as an perosn to get on with. In other words, the student with highest in-degree in this network is the most easy-going person that is selected by her or his classmates.
- # As for the "Best friends" network, the in-degree centrality is the measurement of the number of classmates who deem the student as a best friend. In other words, the student with highest in-degree in this network is the one who many students value the most with regards to friendship, but not necessarily that many would like to work with or get on with.
- # As for the "Work with" network, the in-degree centrality is the measurement of the number of classmates who deem the student as a cooperator. In other words, the student with highest in-degree in this network is the most reliable or responsible person to work with that is selected by her or his classmates.
+ # As for the "Get on with" network, the in-degree centrality is the measurement of the number of classmates who think the student as an person to get on with, but not necessarily the a best friend. In other words, the student with highest in-degree in this network is the most easy-going person that is selected by her or his classmates.
+ 
+ # As for the "Best friends" network, the in-degree centrality is the measurement of the number of classmates who consider the student as a best friend. In other words, the student with highest in-degree in this network is the one who many students value the most with regards to friendship, but not necessarily that many would like to work with or get on with.
+ 
+ # As for the "Work with" network, the in-degree centrality is the measurement of the number of classmates who agree that the the center student is a cooperator. In other words, the student with highest in-degree in this network is the most reliable or responsible person to work with.
 
-Who in the class has the highest closeness centrality?
+## Who in the class has the highest closeness centrality?
 
 ```{r}
 # Closeness for each layer, node's role that is critical inbetween:bridge
@@ -149,21 +154,24 @@ which(closeness(G2, mode = "in")==max(closeness(G2, mode = "in")))
 which(closeness(G3, mode = "in")==max(closeness(G3, mode = "in")))
 which(closeness(G4, mode = "in")==max(closeness(G4, mode = "in")))
 
- ### Comments:
-#Closeness centrality measures how many steps is required to access every other vertex from a given vertex.
-#It is the average length of the shortest path between the node and the other nodes. 
 
- # The 14 and 16 student have the highest in-closeness centrality for "Get on with" network, with the highest in-closeness centrality 0.02631579.
- # The 21 student has the highest in-closeness centrality for "Best friends" network, with the highest in-closeness centrality 0.020833333.
- # The 16 student has the highest in-closeness centrality for "Work with" network, with the highest in-closeness centrality 0.010416667.
-
-# Here in the third graph a warning popped up:At centrality.c:2784 :closeness centrality is not well-defined for disconnected graphsAt centrality
-#Meaning: The closeness centrality of a vertex is defined by the inverse of the average length of the shortest paths to/from all the other vertices in the graph:
-#But what if there are two vertices that have no path between them? How would you compute this? There is no clear answer to this and that is why closeness is not well defined in this case. How is it possible that two nodes might have no path between them? If the graph is disconnected, i.e. has more than one connected component. Let me illustrate with a very simple graph.
 ```
+ ### Comments:
+ #Closeness centrality measures how many steps is required to access every other vertex from a given vertex.
+ #It is the average length of the shortest path between the node and the other nodes. 
+
+ # The 14 and 16 student have the highest in-closeness centrality for "Get on with" network, with the highest in-closeness centrality 0.02631579. In the get on context, it seems to make little sense.
+ 
+ # The 21 student has the highest in-closeness centrality for "Best friends" network, with the highest in-closeness centrality 0.020833333, meaning student number 21 is surrounded by people that,if you want to join in the circle, you may face some network obstacles.
+ # The 16 student has the highest in-closeness centrality for "Work with" network, with the highest in-closeness centrality 0.010416667. In the cooperation context, it seems to make little sense.
+ 
+
+ # Here in the third graph a warning popped up:At centrality.c:2784 :closeness centrality is not well-defined for disconnected graphsAt centrality
+ #Meaning: The closeness centrality of a vertex is defined by the inverse of the average length of the shortest paths to/from all the other vertices in the graph:
+ #But what if there are two vertices that have no path between them? How would you compute this? There is no clear answer to this and that is why closeness is not well defined in this case. How is it possible that two nodes might have no path between them? If the graph is disconnected, i.e. has more than one connected component. Let me illustrate with a very simple graph.
 
 How does **betweeness centrality** differ from degree centrality? Is one more useful than the other? Does their utility differ between your three networks?[https://www.youtube.com/watch?v=0aqvVbTyEmc]
-
+  
 ```{r}
 # Betweeness centrality in each layer; The vertex and edge betweenness are (roughly) defined by the number of geodesics (shortest paths) going through a vertex or an edge.
 # One advantage of betweenness centrality compared to closeness centrality: you don't need a fully connected graph or component to calculate it. A component is a group of nodes connected to each other.
@@ -192,7 +200,6 @@ which(betweenness(G4)==max(betweenness(G4))) # 11
 
 
 ```
-
 
 ## Simple structures
 
