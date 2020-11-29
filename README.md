@@ -29,7 +29,9 @@ It is the **average length** of the shortest path between the node and the other
 In this project we will be working towards building several social network diagrams (graphs/sociograms) of a school classroom and then analyzing both centrality measures and clusters within the network. 
 ## Plots
 
-<img src="./Best_Friend_Social_Network.pdf" alt="Editor" width="1000">
+<img src="./go.png" alt="Editor" width="700">
+<img src="./bf.png" alt="Editor" width="700">
+<img src="./ww.png" alt="Editor" width="700">
 
 ## Results and Insights
 
