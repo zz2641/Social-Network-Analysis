@@ -24,16 +24,16 @@ It is the **average length** of the shortest path between the node and the other
 7. Articulation point: Articuation points or cut vertices are vertices whose removal increases the number of connected components in a graph.
 
 
-## Goals for this unit
+## Tasks for this project
 
-* Be able to generate a basic sociogram
-* Be able to apply and interpret a range of centrality measures to a network
-* Be able to apply and interpret a range of clustering procedures to a network
+In this project we will be working towards building several social network diagrams (graphs/sociograms) of a school classroom and then analyzing both centrality measures and clusters within the network. 
+## Plots
 
-## Tasks for this unit
+<img src="./Best_Friend_Social_Network.pdf" alt="Editor" width="700">
 
-In this unit you will be working towards building several social network diagrams (graphs/sociograms) of a school classroom and then analyzing both centrality measures and clusters within the network. As background to this task please read over the follwing materials and watch the methodological videos. If you find any other useful materials please add them under Additional Materials at the end of the this page and pull request the change back to this repo.
+<img src="./p3.png" alt="Editor" width="700">
 
+<img src="./p3.png" alt="Editor" width="700">
 ## Results and Insights
 
 - After measuring the network, centrality and structural metrics on students' ideas of getting along with others, being best friends with others and intention to work with others, it seems that the class has a harmonous atmosphere that no one has been isolated so far. However, as the visulization and analysis showed, it appears two distinguishable groups bridged by student 13, indicating two possible trends in terms of choosing best friends, and selecting the preferable team player(s). There is also a gender distinction. When it comes to friendships, these teenager girls tend to have bigger social group than their opposite sex. Besides, female students tend to have larger clique than male students. Nonetheless, different gender groups still communicate with each other in the class. Student 8, 11, 14, 16, 20, 21, 22, 23 have quite high centrality in all the networks, which implies that these students serve as important connection to other students.In terms of reciprocity, there are more mutual and asymmeric dyads in "Get on with" network than the other two. 
